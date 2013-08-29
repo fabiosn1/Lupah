@@ -52,26 +52,6 @@
    
     <div data-role="page" id="map_page">
     	
-    	<div data-role="panel" id="mypanel">
-    		<div class="panel-content">
-				<h3>Buscar</h3>
-				<a href="#" data-rel="close" data-role="button" data-theme="a" data-icon="search">UBS mais próxima</a>
-				<a href="#" data-rel="close" data-role="button" data-theme="a" data-icon="home">UBS a partir de casa</a>
-				<a href="#" data-rel="close" data-role="button" data-theme="a" data-icon="grid">Buscar todos</a>
-			</div>
-		</div>
-    	
-			<div data-role="popup" id="popupDialog" data-overlay-theme="a" data-theme="c" data-dismissible="false" style="max-width:400px;" class="ui-corner-all">
-				<div data-role="header" data-theme="a" class="ui-corner-top">
-					<h1>Buscar</h1>
-				</div>
-				<div data-role="content" data-theme="d" class="ui-corner-bottom ui-content">
-				<a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="search">UBS mais próxima</a>
-				<a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="home">UBS a partir de casa</a>
-				<a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="grid">Buscar todos</a>
-				</div>
-			</div>
-			
 		<div data-role="popup" id="popupMenu">
         <ul data-role="listview" data-inset="true" style="min-width:210px;">
             <li data-role="divider">Buscar</li>
@@ -82,12 +62,11 @@
 		</div>
     	
         <div data-theme="a" data-role="header" data-position="fixed" data-id="header">
-        	<a href="#mypanel" data-role="button">Panel</a>
+        	<a href="#popupMenu" data-rel="popup" data-role="button" data-transition="slidedown">Menu</a>
         	<!-- <a data-role="button" data-icon="back" data-transition="slide" data-direction="reverse" href="#" data-rel="back">Voltar</a> -->
             <h3 id="orientation">
                 LUPAH
             </h3>
-            <a href="#popupDialog" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" data-theme="b">Diálogo</a>
         </div>
 
         <div data-role="content" id="mapcontent">
@@ -107,7 +86,6 @@
         </div>
 
         <div data-theme="a" data-role="footer" data-position="fixed" data-id="footer" class="ui-bar">
-        	<a href="#popupMenu" data-rel="popup" data-role="button" data-transition="slideup">Menu</a>
 
         </div>
     </div>

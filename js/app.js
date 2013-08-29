@@ -11,16 +11,6 @@ var map_type = null;
 
 var google_map;
 
-
-// appMobi
-var onDeviceReady=function(){
-	console.log("onDeviceReady");
-	AppMobi.device.setRotateOrientation("portrait");
-    AppMobi.device.setAutoRotate(false);	
-};
-document.addEventListener("appMobi.device.ready",onDeviceReady,false);
-
-
 $(document).on('pageshow', '#map_page', function(e, data) {
 	
 	// mostrar mensagem de carregando.
