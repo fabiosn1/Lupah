@@ -10,17 +10,190 @@ var zoom = null;
 var map_type = null;
 
 var google_map;
+var updates_counter = 0;
+
+//é chamada antes da pagina carregar.
+getMetadataOnline();
+
+function getMetadataOnline(){
+	console.log('getMetadataOnline');
+	$.ajax({
+		type: 'GET',
+		dataType : 'json',
+		url: 'https://script.google.com/macros/s/AKfycbyFxDH37YzSCmx_QgBT3mQ8QPqKXX91Tj2XMgxCbkfaX6OgfDcJ/exec',
+		beforeSend: function(){
+			//startLoadingMessage("Verificando versão...");
+		},
+		error: function(jqxhr,status,error){
+			//stopLoadingMessage();
+			//errorMessage(status+' : '+error);
+		},
+		success: function(data,status){
+			//stopLoadingMessage();
+			//errorMessage(status+' : '+data);
+			checkMetadata(data);
+		}		
+	});
+}
+
+function checkMetadata(metadataOnline){
+	console.log('checkMetaData');
+	console.log('online : ' + JSON.stringify(metadataOnline));
+	var metadata;
+	if(localStorage.getItem("Metadata")){
+		metadata = JSON.parse(localStorage.getItem("Metadata"));		
+	}else{
+		metadata = new Object;
+		metadata.IconsVersion = 0;
+		metadata.MapVersion = 0;
+		localStorage.setItem("Metadata",JSON.stringify(metadata));
+	}
+	console.log('device : ' + JSON.stringify(metadata));
+	
+	var actualMetada = metadataOnline;
+	upUpdates();
+	if(metadata.IconsVersion != actualMetada.IconsVersion || !localStorage.getItem("Icones")){
+		loadIconsData();
+		metadata.IconsVersion = actualMetada.IconsVersion;
+		localStorage.setItem("Metadata",JSON.stringify(metadata));
+		console.log('new : ' + JSON.stringify(metadata));
+		upUpdates();
+	}
+	if(metadata.MapVersion != actualMetada.MapVersion || !localStorage.getItem("PontosMapa")){
+		loadMapData();
+		metadata.MapVersion = actualMetada.MapVersion;
+		localStorage.setItem("Metadata",JSON.stringify(metadata));
+		console.log('new : ' + JSON.stringify(metadata));
+		upUpdates();
+	}
+	downUpdates();
+}
+
+function upUpdates(){
+	updates_counter++;
+	console.log('upUpdates: '+ updates_counter);
+}
+
+function downUpdates(){
+	updates_counter--;
+	console.log('downUpdates: '+ updates_counter);
+	if(updates_counter == 0){
+		plotMapData();
+	}
+}
+
+function loadIconsData(){
+	console.log('loadIconsData');
+	var url = 'https://script.google.com/macros/s/AKfycbxvbOD2urgp865hZFZbjcCYCfMvWLNcSBkcoGgYzupGo1hlsw8/exec?get=icones'; // parametro final comoo icones
+	$.ajax({
+		type: 'GET',
+		dataType : 'json',
+		url: url,
+		beforeSend: function(){
+			startLoadingMessage("Atualizando icones...");
+		},
+		error: function(jqxhr,status,error){
+			stopLoadingMessage();
+			errorMessage(status+' : '+error);
+		},
+		success: function(data,status){
+			stopLoadingMessage();
+			callbackLoadIconsData(data);
+		}		
+	});	
+}
+
+function callbackLoadIconsData(data){
+	console.log('callbackLoadIconsData');
+	var icones = new Array;	
+	for(var i=0;i<data.length;i++){
+		icones[data[i][0]] = data[i][1];
+	}
+	console.log(icones);
+	localStorage.setItem("Icones",JSON.stringify(icones));
+	downUpdates();
+}
+
+function loadMapData(){
+	console.log('loadMapData');
+	var url = 'https://script.google.com/macros/s/AKfycbxvbOD2urgp865hZFZbjcCYCfMvWLNcSBkcoGgYzupGo1hlsw8/exec?get=pontos'; // parametro final comoo pontos
+	$.ajax({
+		type: 'GET',
+		dataType : 'json',
+		url: url,
+		beforeSend: function(){
+			startLoadingMessage("Atualizando dados...");
+		},
+		error: function(jqxhr,status,error){
+			stopLoadingMessage();
+			errorMessage(status+' : '+error);
+		},
+		success: function(data,status){
+			stopLoadingMessage();
+			callbackLoadMapData(data);
+		}		
+	});	
+}
+
+function callbackLoadMapData(data){
+	console.log('callbackLoadMapData');
+	var mapa = new Array;	
+	for(var i=0;i<data.length;i++){
+		mapa[data[i][0]] = data[i].slice(1);
+	}
+	console.log(mapa);
+	localStorage.setItem("PontosMapa",JSON.stringify(mapa));
+	downUpdates();
+}
+
+function startLoadingMessage(text){
+	// mostrar mensagem de carregando.
+	$.mobile.loading("show",{
+		text: text,
+		textVisible: true	
+	});
+}
+
+function stopLoadingMessage(){
+	$.mobile.loading("hide");
+}
+
+function errorMessage(message){
+	console.log('errorMessage : ' + message);
+	$('#error_message').text(message);
+	$('#dialogo').popup('open');
+}
+
+
+function plotMapData(){
+	console.log('plotMapData');
+	var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
+	var icones = JSON.parse(localStorage.getItem("Icones"));
+	console.log(pontos);
+	console.log(icones);
+	
+	var icone;
+	for(var i=0;i<pontos.length;i++){
+		icone = icones[pontos[i][0]]; 
+		var marker = new google.maps.Marker({
+			title: pontos[i][1],
+			position: new google.maps.LatLng(parseFloat(pontos[i][3]),parseFloat(pontos[i][4])),
+			icon: {url: icone, scaledSize: new google.maps.Size(80,80)},
+			map: google_map
+		});
+		console.log(marker);
+	}
+	console.log('end of plotMapData');
+}
 
 $(document).on('pageshow', '#map_page', function(e, data) {
 	
-	// mostrar mensagem de carregando.
-	$.mobile.loading("show",{
-		text: "Carregando mapa...",
-		textVisible: true	
-		});
-	$('#map_canvas').css('height', getRealContentHeight());
 	
-	carregarMapa();
+	
+	//startLoadingMessage("Carregando mapa...");
+			
+	$('#map_canvas').css('height', getRealContentHeight());
+	criarMapa();
 
 	
 	// script para carregar os pontos do google drive.
@@ -31,6 +204,7 @@ $(document).on('pageshow', '#map_page', function(e, data) {
 	document.getElementsByTagName('head')[0].appendChild(scriptElement);
 	*/
 	
+	/*
 	console.log('Ajax para pegar dados do Google Drive');	
 	var DATA_DRIVE_URL = "https://script.google.com/macros/s/AKfycbzKqbooUVVho1MLxfX5mFc_2_BwGk3kwj8D-UK2A2COAFU3Lns/exec";
 	$.ajax(DATA_DRIVE_URL,{
@@ -42,30 +216,11 @@ $(document).on('pageshow', '#map_page', function(e, data) {
 		},
 		error: function(jqXHR, status, error){
 			$.mobile.loading("hide");
-			console.log(status + ' : ' + error);
-			$('#error_message').text(status + ' : ' + error);
-			$('#dialogo').popup('open');
+			errorMessage(status + ' : ' + error);
 		}
 	});
-	
+	*/
 });
-
-function load_data(data){
-	console.log('load_data:');
-	console.log(data);
-	
-	for(var i=1;i<data.length;i++){
-			
-		var marker = new google.maps.Marker({
-			title: data[i][1],
-			position: new google.maps.LatLng(data[i][2],data[i][3]),
-			icon: data[i][4],
-			map: google_map
-		});
-	}
-	
-	$.mobile.loading("hide");
-}
 
 
 $(document).on('pageshow', function(e) {
@@ -93,7 +248,7 @@ $(window).on( "orientationchange", function( event ) {
 });
 
 
-function carregarMapa(){
+function criarMapa(){
 	console.log('Carregando mapa');
 
 	google_map = new google.maps.Map(document.getElementById('map_canvas'), {
