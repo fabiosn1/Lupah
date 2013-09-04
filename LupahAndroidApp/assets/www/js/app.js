@@ -305,11 +305,12 @@ function plotMapData(firsttime){
 	
 	var icone;
 	for(var i=0;i<pontos.length;i++){
-		icone = icones[pontos[i][0]]; 
+		icone = icones[pontos[i][0]];
+		//icone = './imgs/icon_ama.png'; 
 		var marker = new google.maps.Marker({
 			title: pontos[i][1],
 			position: new google.maps.LatLng(parseFloat(pontos[i][3]),parseFloat(pontos[i][4])),
-			icon: {url: icone, scaledSize: new google.maps.Size(60,60)},
+			icon: {url: icone, scaledSize: new google.maps.Size(46,54)},
 			map: google_map
 		});
 		//console.log(marker);
