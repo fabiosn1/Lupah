@@ -9,8 +9,10 @@ var center_longitude = null;
 var zoom = null;
 var map_type = null;
 
-var orientationChanged = false; // guarda se a orientação foi alterada para plotar os pontos no mappa novamente.
 var google_map; // objeto do mapa
+var markers = new Array;
+
+var orientationChanged = false; // guarda se a orientação foi alterada para plotar os pontos no mappa novamente.
 var updates_counter = 0; // semaforo para controlar atualização de dados(icones e pontos no mapa) impedindo que o mapa seja plotado com dados antigos.
 
 var geolocation_watcher; // watcher que pegar a posição do GPS a cada intervalo de tempo
@@ -120,8 +122,8 @@ function createMarker(pos,firsttime){
 			zIndex: 1
 		});
 	if(firsttime){
-		google_map.panTo(posLatLng);
-		google_map.setZoom(13);
+		//google_map.panTo(posLatLng);
+		//google_map.setZoom(13);
 	}
 }
 
@@ -303,17 +305,27 @@ function plotMapData(firsttime){
 	//console.log(pontos);
 	//console.log(icones);
 	
-	var icone;
+	var infowindow = new google.maps.InfoWindow();
 	for(var i=0;i<pontos.length;i++){
-		icone = icones[pontos[i][0]];
-		//icone = './imgs/icon_ama.png'; 
-		var marker = new google.maps.Marker({
+		var icone = icones[pontos[i][0]];
+		markers[i] = new google.maps.Marker({
 			title: pontos[i][1],
 			position: new google.maps.LatLng(parseFloat(pontos[i][3]),parseFloat(pontos[i][4])),
 			icon: {url: icone, scaledSize: new google.maps.Size(46,54)},
 			map: google_map
 		});
-		//console.log(marker);
+		console.log(markers[i]);
+		
+		var contentInfo = '<link rel="stylesheet" href="css/themes/LupahTheme.min.css" /><link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.min.css" />' +
+    						'<div><h2>'+ pontos[i][1] + '</h2><p>' + pontos[i][13] + '</p></div>';
+    						
+		google.maps.event.addListener(markers[i],'click',(function (marker,content){
+			return function(){
+				infowindow.setContent(content);
+				infowindow.open(google_map,marker);
+			};
+		})(markers[i],contentInfo));
+			//markers[i].infowindow.open(google_map,markers[i].marker);
 	}
 	stopLoadingMessage();
 	console.log('end of plotMapData, '+ pontos.length + ' points.');
