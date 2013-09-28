@@ -20,7 +20,7 @@ var currentPositionData; // objeto posição da posição atual
 var currentPositionMarker; // marcador que mostra a posição atual do GPS no mapa.
 var isWatching = false; // indica se esta lendo a posição do usuario.
 
-//var config_followPos = false; // desnecessário implementar.
+var config_followPos = false;
 
 //é chamada antes da pagina carregar.
 getMetadataOnline();
@@ -83,7 +83,7 @@ function startWatchPosition(){
 function stopWatchPosition(){
 	console.log('stopWatchPosition');
 	isWatching = false;
-	navigator.geolocation.clearWatch(geolocation_watcher);
+	navigator.geolocation.clearW
 }
 
 function geolocationError(error){
@@ -122,8 +122,8 @@ function createMarker(pos,firsttime){
 			zIndex: 1
 		});
 	if(firsttime){
-		google_map.panTo(posLatLng);
-		google_map.setZoom(13);
+		//google_map.panTo(posLatLng);
+		//google_map.setZoom(13);
 	}
 }
 
@@ -305,7 +305,8 @@ function plotMapData(firsttime){
 	//console.log(pontos);
 	//console.log(icones);
 	
-	var infowindow = new google.maps.InfoWindow();
+	var infoBubble = new InfoBubble();
+	//var infowindow = new google.maps.InfoWindow();
 	for(var i=0;i<pontos.length;i++){
 		var icone = icones[pontos[i][0]];
 		markers[i] = new google.maps.Marker({
@@ -316,21 +317,21 @@ function plotMapData(firsttime){
 		});
 		console.log(markers[i]);
 		
-		//var contentInfo = '<link rel="stylesheet" href="css/themes/LupahTheme.min.css" /><link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.min.css" />' +
-    	//					'<div><h2>'+ pontos[i][1] + '</h2><p>' + pontos[i][13] + '</p><button>Tesste</button></div>';
+		var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[i][3]+','+ pontos[i][4];
     	
-    	var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[i][3]+','+ pontos[i][4];
-    	
-    	var contentInfo = '<div id="content"><h2>'+ pontos[i][1] + '</h2><p>Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
-    	'<a href="'+url_rota+'" data-role="button" data-inline="true" target="_blank">Rota</a>  ' +
-    	'<a href="'+pontos[i][15]+'" data-role="button" data-inline="true" target="_blank">Site</a>  ' +
-    	'<a href="tel:'+pontos[i][12]+'" data-role="button" data-inline="true" target="_blank">'+ pontos[i][12] +'</a>  ' + 
-    	'</div>';
-    						
+    		var contentInfo = '<div id="content"><h2>'+ pontos[i][1] + '</h2><p>Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
+    		'<a href="'+url_rota+'" data-role="button" data-inline="true" target="_blank">Rota</a>  ' +
+    		'<a href="'+pontos[i][15]+'" data-role="button" data-inline="true" target="_blank">Site</a>  ' +
+    		'<a href="tel:'+pontos[i][12]+'" data-role="button" data-inline="true" target="_blank">'+ pontos[i][12] +'</a>  ' + 
+    		'</div>';
+    					
 		google.maps.event.addListener(markers[i],'click',(function (marker,content){
 			return function(){
-				infowindow.setContent(content);
-				infowindow.open(google_map,marker);
+			 	
+		       infoBubble.open(google_map, marker);
+		       infoBubble.setContent(content);
+		      // infoBubble.addTab('sample', content);
+		     
 			};
 		})(markers[i],contentInfo));
 			//markers[i].infowindow.open(google_map,markers[i].marker);
