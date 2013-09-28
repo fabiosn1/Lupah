@@ -20,7 +20,7 @@ var currentPositionData; // objeto posição da posição atual
 var currentPositionMarker; // marcador que mostra a posição atual do GPS no mapa.
 var isWatching = false; // indica se esta lendo a posição do usuario.
 
-var config_followPos = false;
+//var config_followPos = false; // desnecessário implementar.
 
 //é chamada antes da pagina carregar.
 getMetadataOnline();
@@ -83,7 +83,7 @@ function startWatchPosition(){
 function stopWatchPosition(){
 	console.log('stopWatchPosition');
 	isWatching = false;
-	navigator.geolocation.clearW
+	navigator.geolocation.clearWatch(geolocation_watcher);
 }
 
 function geolocationError(error){
@@ -317,7 +317,8 @@ function plotMapData(firsttime){
 		console.log(markers[i]);
 		
 		var contentInfo = '<link rel="stylesheet" href="css/themes/LupahTheme.min.css" /><link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.min.css" />' +
-    						'<div><h2>'+ pontos[i][1] + '</h2><p>' + pontos[i][13] + '</p></div>';
+    						'<div><h2>'+ pontos[i][1] + '</h2><p>' + pontos[i][13] + '</p><button>Tesste</button></div>';
+    	
     						
 		google.maps.event.addListener(markers[i],'click',(function (marker,content){
 			return function(){
