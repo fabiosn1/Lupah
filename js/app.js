@@ -122,8 +122,8 @@ function createMarker(pos,firsttime){
 			zIndex: 1
 		});
 	if(firsttime){
-		//google_map.panTo(posLatLng);
-		//google_map.setZoom(13);
+		google_map.panTo(posLatLng);
+		google_map.setZoom(13);
 	}
 }
 
@@ -316,9 +316,16 @@ function plotMapData(firsttime){
 		});
 		console.log(markers[i]);
 		
-		var contentInfo = '<link rel="stylesheet" href="css/themes/LupahTheme.min.css" /><link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.min.css" />' +
-    						'<div><h2>'+ pontos[i][1] + '</h2><p>' + pontos[i][13] + '</p><button>Tesste</button></div>';
+		//var contentInfo = '<link rel="stylesheet" href="css/themes/LupahTheme.min.css" /><link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.min.css" />' +
+    	//					'<div><h2>'+ pontos[i][1] + '</h2><p>' + pontos[i][13] + '</p><button>Tesste</button></div>';
     	
+    	var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[i][3]+','+ pontos[i][4];
+    	
+    	var contentInfo = '<div id="content"><h2>'+ pontos[i][1] + '</h2><p>Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
+    	'<a href="'+url_rota+'" data-role="button" data-inline="true" target="_blank">Rota</a>  ' +
+    	'<a href="'+pontos[i][15]+'" data-role="button" data-inline="true" target="_blank">Site</a>  ' +
+    	'<a href="tel:'+pontos[i][12]+'" data-role="button" data-inline="true" target="_blank">'+ pontos[i][12] +'</a>  ' + 
+    	'</div>';
     						
 		google.maps.event.addListener(markers[i],'click',(function (marker,content){
 			return function(){
