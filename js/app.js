@@ -20,6 +20,8 @@ var currentPositionData; // objeto posição da posição atual
 var currentPositionMarker; // marcador que mostra a posição atual do GPS no mapa.
 var isWatching = false; // indica se esta lendo a posição do usuario.
 
+var infowindow; // infowindow global, utilizado em duas funcoes: plotmapadata e resultSelection_onClick
+
 var config_followPos = false;
 
 //é chamada antes da pagina carregar.
@@ -305,7 +307,10 @@ function plotMapData(firsttime){
 	//console.log(pontos);
 	//console.log(icones);
 	
-	var infowindow = new google.maps.InfoWindow();
+	if(infowindow == undefined){
+	  infowindow = new google.maps.InfoWindow();
+	  
+	}
 	for(var i=0;i<pontos.length;i++){
 		var icone = icones[pontos[i][0]];
 		markers[i] = new google.maps.Marker({
@@ -315,17 +320,21 @@ function plotMapData(firsttime){
 			map: google_map
 		});
 		console.log(markers[i]);
-		
-		var contentInfo = '<link rel="stylesheet" href="css/themes/LupahTheme.min.css" /><link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.min.css" />' +
-    						'<div><h2>'+ pontos[i][1] + '</h2><p>' + pontos[i][13] + '</p></div>';
-    						
+        var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[i][3]+','+ pontos[i][4];
+    	
+    	var contentInfo = '<div id="content"><h2>'+ pontos[i][1] + '</h2><p>Tipo: ' + pontos[i][2] + '<br><br>' + pontos[i][13] + '</p>'+
+    	'<a href="'+url_rota+'" data-role="button" data-inline="true" target="_blank">Rota</a>  ' +
+   		'<a href="'+pontos[i][15]+'" data-role="button" data-inline="true" target="_blank">Site</a>  ' +
+   		'<a href="tel:'+pontos[i][12]+'" data-role="button" data-inline="true" target="_blank">'+ pontos[i][12] +'</a>  ' + 
+   		'</div>';
+					
 		google.maps.event.addListener(markers[i],'click',(function (marker,content){
 			return function(){
 				infowindow.setContent(content);
 				infowindow.open(google_map,marker);
 			};
 		})(markers[i],contentInfo));
-			//markers[i].infowindow.open(google_map,markers[i].marker);
+
 	}
 	stopLoadingMessage();
 	console.log('end of plotMapData, '+ pontos.length + ' points.');
@@ -379,4 +388,20 @@ function searchByName(nameTextInput){
 function resultSelection_onClick(liElement){
     var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
     google_map.panTo(new google.maps.LatLng(pontos[liElement.value][3] , pontos[liElement.value][4]));
+    google_map.setZoom(13);
+    if(infowindow == undefined){
+    	window.alert('infowindow');
+    	infowindow = new google.maps.InfoWindow();
+    }
+    var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[liElement.value][3]+','+ pontos[liElement.value][4];
+    	
+    	var contentInfo = '<div id="content"><h2>'+ pontos[liElement.value][1] + '</h2><p>Tipo: ' + pontos[liElement.value][2] + '<br><br>' + pontos[liElement.value][13] + '</p>'+
+    	'<a href="'+url_rota+'" data-role="button" data-inline="true" target="_blank">Rota</a>  ' +
+   		'<a href="'+pontos[liElement.value][15]+'" data-role="button" data-inline="true" target="_blank">Site</a>  ' +
+   		'<a href="tel:'+pontos[liElement.value][12]+'" data-role="button" data-inline="true" target="_blank">'+ pontos[liElement.value][12] +'</a>  ' + 
+   		'</div>';
+					
+		infowindow.setContent(contentInfo);
+		infowindow.open(google_map, markers[liElement.value]);
+
 }

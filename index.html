@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="css/jquery.mobile.structure-1.3.2.min.css" />
     
     <!-- insercao de script para infobubble -->
-    <script type="text/javascript" src="js/infobubble.js"></script>
+    <script type="text/javascript" src="js/infobubble.js"> </script>
     
     <!-- <script type="text/javascript" src="js/cordova.js"></script> -->
     <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>  
@@ -81,13 +81,12 @@
         </div>
 
         <div data-theme="a" data-role="footer" data-position="fixed" data-id="footer" class="ui-bar">
-		    <a href="#popupBasic" data-rel="popup">Open Popup</a>
- 			<div data-role="popup" id="popupBasic" data-transition="slideup">
-  				<label id="searchLabel"> Pesquisar </label>
+		    <a href="#popupBasic" data-rel="popup">Pesquisar</a>
+ 			<div data-role="popup" id="popupBasic" data-transition="slideup" class="ui-content">
+  				
   				<input id="searchTextInput" type="search" style="border-left-width: 20px; border-right-width: 20px" onkeyup="searchByName(searchTextInput)"> </input>
-  				<div data-role="button" style="{width: 50;}"><a href="#resultSelection" data-rel="popup"> OK </a></div>
-  				 
-  				<div data-transition="slideup" data-role="popup" id="resultSelection">
+  				<div data-role="button" data-inline="true" style="{margin: 30px}"><a href="#resultSelection" data-rel="popup"> Pesquisar </a></div>
+  				<div data-transition="slideup" data-role="popup" id="resultSelection" class="ui-content">
   					<ul id="resultsList" data-role="listview" data-theme="g"> </ul>	
   				</div>
 			</div>
