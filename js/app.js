@@ -24,6 +24,7 @@ var infowindow; // infowindow global, utilizado em duas funcoes: plotmapadata e 
 
 var config_followPos = false;
 
+var theme_Class = 'solid'; // indica qual eh o tema utilizado no momento pela div resultSelection 
 //é chamada antes da pagina carregar.
 getMetadataOnline();
 
@@ -371,30 +372,40 @@ function getRealContentHeight() {
 }
 
 function searchByName(nameTextInput){
-    _searchResultsIds = new Array(); 	
-    $('#resultsList').empty(); // empties resultsList (because of the last insertion)	
-    var pontos = JSON.parse(localStorage.getItem('PontosMapa'));
-    var j = 0; 
+	var icones = JSON.parse(localStorage.getItem('Icones'));
+	var pontos = JSON.parse(localStorage.getItem('PontosMapa'));
+	var j = 0;
+	 
+    $('#resultsList').empty(); // empties resultsList (because of the last insertion)
+	
 	for(var i = 0; i < pontos.length && nameTextInput.value.length > 1; i++){ // only starts searching if the word has more than 2 letters
-		var indexOf;
- 		if((indexOf = pontos[i][1].toLowerCase().indexOf(nameTextInput.value.toLowerCase())) != -1){
- 			console.log('nomePto: ' + nameTextInput.value + ' , ' + pontos[i][1] + pontos.length + ' i: '+ i + 'indexOf' + indexOf);    
-			$('#resultsList').append('<li value=' + i +' onclick=resultSelection_onClick(this)><a href="#">' + pontos[i][1] + '</a></li>');
+ 		if(pontos[i][1].toLowerCase().indexOf(nameTextInput.value.toLowerCase()) != -1){
+ 			
+ 			$('#resultsList').append('<li value=' + i +' onclick=resultSelection_onClick(this)> <a href="#">' + pontos[i][1] + '</a></li>');
 		}
 	}	
+	
 	$("#resultsList").listview("refresh");
+	$('#resultSelection').popup({ theme: "a" });
+   	
+   	theme_Class = 'solid';
 }
 
+
 function resultSelection_onClick(liElement){
-    var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
-    google_map.panTo(new google.maps.LatLng(pontos[liElement.value][3] , pontos[liElement.value][4]));
-    google_map.setZoom(13);
-    if(infowindow == undefined){
-    	window.alert('infowindow');
-    	infowindow = new google.maps.InfoWindow();
-    }
-    var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[liElement.value][3]+','+ pontos[liElement.value][4];
-    	
+	if(theme_Class === 'solid'){
+		$('#resultSelection').popup({ theme: "none" });
+		theme_Class = 'translucent';
+	    var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
+	    google_map.panTo(new google.maps.LatLng(pontos[liElement.value][3] , pontos[liElement.value][4]));
+    	google_map.setZoom(13);
+    	if(infowindow == undefined){
+	    	window.alert('infowindow');
+    		infowindow = new google.maps.InfoWindow();
+    	}
+ 
+    	var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[liElement.value][3]+','+ pontos[liElement.value][4];
+	    	
     	var contentInfo = '<div id="content"><h2>'+ pontos[liElement.value][1] + '</h2><p>Tipo: ' + pontos[liElement.value][2] + '<br><br>' + pontos[liElement.value][13] + '</p>'+
     	'<a href="'+url_rota+'" data-role="button" data-inline="true" target="_blank">Rota</a>  ' +
    		'<a href="'+pontos[liElement.value][15]+'" data-role="button" data-inline="true" target="_blank">Site</a>  ' +
@@ -403,5 +414,9 @@ function resultSelection_onClick(liElement){
 					
 		infowindow.setContent(contentInfo);
 		infowindow.open(google_map, markers[liElement.value]);
-
+    }else{
+    	$('#resultSelection').popup({ theme: "a" });
+    	theme_Class = 'solid';
+    }
 }
+
