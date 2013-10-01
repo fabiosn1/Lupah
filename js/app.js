@@ -391,7 +391,6 @@ function searchByName(nameTextInput){
    	theme_Class = 'solid';
 }
 
-
 function resultSelection_onClick(liElement){
 	if(theme_Class === 'solid'){
 		$('#resultSelection').popup({ theme: "none" });
@@ -420,3 +419,56 @@ function resultSelection_onClick(liElement){
     }
 }
 
+function boxclick(box) {
+        if (box.checked) {
+          show();
+        } else {
+          hide();
+        }
+      }
+      
+function show() {
+	   var elementos = document.getElementsByName('checkbox');
+	   var index;
+	   var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
+       for (var i = 0; i < pontos.length; i++) {
+         for(var j = 0; j < elementos.length; j++){
+           if(elementos[j].checked && (index = pontos[i][2].toUpperCase().indexOf(elementos[j].getAttribute('class').toUpperCase())) != -1) {
+             console.log('i: ' + i + 'setVisible: ' + pontos[i][1] + ' index: ' + index);
+             markers[i].setVisible(true);
+         }else if(!elementos[j].checked  && (index = pontos[i][2].toUpperCase().indexOf(elementos[j].getAttribute('class').toUpperCase())) != -1){
+         	console.log('i: ' + i + 'setInvisible: ' + pontos[i][1] + ' index: ' + index);
+            markers[i].setVisible(false);
+         }
+       }
+      }
+}
+function hide() {
+	   var elementos = document.getElementsByName('checkbox');
+	   var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
+       
+       if(checkedCount(elementos)!=0){
+        for (var i = 0; i < pontos.length; i++) {
+          for(var j = 0; j < elementos.length; j++){
+            if(!elementos[j].checked && pontos[i][2].toUpperCase().indexOf(elementos[j].getAttribute('class').toUpperCase()) != -1) {
+              console.log('setVisible');
+              markers[i].setVisible(false);
+          }
+         }
+       }
+      }else{
+      	for(var i = 0; i < pontos.length; i++){
+      		markers[i].setVisible(true);
+      	}
+      }
+}
+
+function checkedCount(elements){
+	var count = 0;
+	for(var i = 0; i < elements.length; i++){
+		if(elements[i].checked){
+		   count++;	
+		}
+	}
+	return count;
+}
