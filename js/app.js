@@ -371,36 +371,41 @@ function getRealContentHeight() {
 	return content_height;
 }
 
-function searchByName(nameTextInput){
-	var icones = JSON.parse(localStorage.getItem('Icones'));
-	var pontos = JSON.parse(localStorage.getItem('PontosMapa'));
-	var j = 0;
+
+function searchBtn_OnClick(){
+	
+  if($('#resultsList').length == 0){	
+	 var pontos = JSON.parse(localStorage.getItem('PontosMapa'));
+  	 var j = 0;
+	 var content = []; 
 	 
-    $('#resultsList').empty(); // empties resultsList (because of the last insertion)
+     for(var i = 0; i < pontos.length; i++){ // only starts searching if the word has more than 2 letters
+  			content[i] = '<li value=' + i +' onclick=resultSelection_onClick(this)> <a href="#">' + pontos[i][1] + '</a></li>';
+     }	
+ 	
+	// $listview.children(':visible').not().show();
+	 
+	 $('<ul/>',{'id':'resultsList','data-role':'listview', 'data-filter-placeholder':'Procurar locais...','data-inset':true, 'data-filter-reveal':true, 'data-filter':true}).appendTo( '#popupBasic' );
+     $.each(content, function(i,v) { $('<li/>').html( v ).appendTo( '#popupBasic ul' ); });
 	
-	for(var i = 0; i < pontos.length && nameTextInput.value.length > 1; i++){ // only starts searching if the word has more than 2 letters
- 		if(pontos[i][1].toLowerCase().indexOf(nameTextInput.value.toLowerCase()) != -1){
- 			
- 			$('#resultsList').append('<li value=' + i +' onclick=resultSelection_onClick(this)> <a href="#">' + pontos[i][1] + '</a></li>');
-		}
-	}	
-	
-	$("#resultsList").listview("refresh");
-	$('#resultSelection').popup({ theme: "a" });
-   	
-   	theme_Class = 'solid';
+	 $('#popupBasic').trigger('create');
+	 
+	 $("#mapcontent").css('position', 'fixed');
+	 
+   	 
+   	 theme_Class = 'solid';
+  }
 }
 
 function resultSelection_onClick(liElement){
-	if(theme_Class === 'solid'){
-		$('#resultSelection').popup({ theme: "none" });
-		theme_Class = 'translucent';
-	    var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
+	
+	    $("#popupBasic").popup('close');
+    
+		var pontos = JSON.parse(localStorage.getItem("PontosMapa"));
 	    google_map.panTo(new google.maps.LatLng(pontos[liElement.value][3] , pontos[liElement.value][4]));
     	google_map.setZoom(13);
     	if(infowindow == undefined){
-	    	window.alert('infowindow');
-    		infowindow = new google.maps.InfoWindow();
+			infowindow = new google.maps.InfoWindow();
     	}
  
     	var url_rota = 'http://maps.google.com/maps?saddr='+ currentPositionData.coords.latitude +','+ currentPositionData.coords.longitude +'&daddr='+ pontos[liElement.value][3]+','+ pontos[liElement.value][4];
@@ -413,10 +418,7 @@ function resultSelection_onClick(liElement){
 					
 		infowindow.setContent(contentInfo);
 		infowindow.open(google_map, markers[liElement.value]);
-    }else{
-    	$('#resultSelection').popup({ theme: "a" });
-    	theme_Class = 'solid';
-    }
+    
 }
 
 function boxclick(box) {
